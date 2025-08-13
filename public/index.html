@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Voice Expense Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #333;
+    }
+    .container {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+      max-width: 500px;
+      width: 90%;
+      text-align: center;
+    }
+    h1 {
+      color: #667eea;
+      margin-bottom: 10px;
+      font-size: 2.5em;
+    }
+    .subtitle {
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 1.1em;
+    }
+    .mic-button {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: none;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      font-size: 3em;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin: 20px 0;
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+    }
+    .mic-button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+    }
+    .mic-button.recording {
+      background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+    .status {
+      margin: 20px 0;
+      font-size: 1.1em;
+      min-height: 30px;
+    }
+    .transcript {
+      background: #f8f9fa;
+      border-radius: 10px;
+      padding: 20px;
+      margin: 20px 0;
+      min-height: 60px;
+      border-left: 4px solid #667eea;
+      text-align: left;
+    }
+    .expense-card {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border-radius: 15px;
+      padding: 25px;
+      margin: 20px 0;
+      display: none;
+    }
+    .expense-card.show { display: block; }
+    .amount {
+      font-size: 2.5em;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .category {
+      font-size: 1.3em;
+      opacity: 0.9;
+    }
+    .ai-insights {
+      background: #f8f9fa;
+      border-radius: 10px;
+      padding: 15px;
+      margin: 15px 0;
+      font-size: 0.9em;
+      text-align: left;
+      display: none;
+    }
+    .ai-insights.show { display: block; }
+    .daily-summary {
+      background: #e8f5e8;
+      border-radius: 10px;
+      padding: 20px;
+      margin: 20px 0;
+      text-align: left;
+    }
+    .daily-total {
+      font-size: 1.5em;
+      font-weight: bold;
+      color: #2d5a2d;
+      margin-bottom: 10px;
+    }
+    .recent-expenses {
+      max-height: 150px;
+      overflow-y: auto;
+    }
+    .expense-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 5px 0;
+      border-bottom: 1px solid #ddd;
+    }
+    .aws-badge {
+      background: #ff9900;
+      color: white;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.8em;
+      margin-left: 10px;
+    }
+    .currency-toggle {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 20px 0;
+    }
+    .currency-btn {
+      padding: 8px 16px;
+      border: 2px solid #667eea;
+      background: white;
+      color: #667eea;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .currency-btn.active {
+      background: #667eea;
+      color: white;
+    }
+    .error {
+      color: #ff6b6b;
+      background: #ffe0e0;
+      padding: 15px;
+      border-radius: 10px;
+      margin: 20px 0;
+      display: none;
+    }
+    .export-btn {
+      background: #28a745;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 20px;
+      cursor: pointer;
+      margin: 10px 5px;
+      transition: all 0.3s ease;
+    }
+    .export-btn:hover {
+      background: #218838;
+      transform: translateY(-1px);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>💰 Voice Expense</h1>
+    <p class="subtitle">Powered by AWS Transcribe + Comprehend <span class="aws-badge">AWS</span></p>
+    
+    <div class="currency-toggle">
+      <button class="currency-btn active" id="usdBtn" onclick="setCurrency('USD')">USD ($)</button>
+      <button class="currency-btn" id="ngnBtn" onclick="setCurrency('NGN')">NGN (₦)</button>
+    </div>
+    
+    <button class="mic-button" id="micButton" onclick="toggleRecording()">🎤</button>
+    
+    <div class="status" id="status">Ready to listen</div>
+    
+    <div class="transcript" id="transcript">Your speech will appear here...</div>
+    
+    <div class="expense-card" id="expenseCard">
+      <div class="amount" id="amount">₦0</div>
+      <div class="category" id="category">Category</div>
+    </div>
+    
+    <div class="ai-insights" id="aiInsights">
+      <strong>🤖 AWS AI Analysis:</strong>
+      <div id="comprehendResults"></div>
+    </div>
+    
+    <div class="daily-summary" id="dailySummary">
+      <div class="daily-total" id="dailyTotal">Today's Total: ₦0</div>
+      <strong>Recent Expenses:</strong>
+      <div class="recent-expenses" id="recentExpenses">
+        <div style="text-align: center; color: #666; padding: 20px;">No expenses yet today</div>
+      </div>
+      <div style="text-align: center; margin-top: 15px;">
+        <button class="export-btn" onclick="exportData()">📊 Export CSV</button>
+      </div>
+    </div>
+    
+    <div class="error" id="error"></div>
+  </div>
+
+  <script>
+    let recognition;
+    let isRecording = false;
+    let currentCurrency = 'USD';
+    let currencySymbol = '$';
+    
+    if ('webkitSpeechRecognition' in window) {
+      recognition = new webkitSpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = true;
+      recognition.lang = 'en-US';
+      
+      recognition.onstart = () => {
+        document.getElementById('status').textContent = '🎤 Listening...';
+      };
+      
+      recognition.onresult = (event) => {
+        let transcript = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          transcript += event.results[i][0].transcript;
+        }
+        document.getElementById('transcript').textContent = transcript;
+        
+        if (event.results[event.results.length - 1].isFinal) {
+          processExpense(transcript);
+        }
+      };
+      
+      recognition.onend = () => {
+        isRecording = false;
+        document.getElementById('micButton').classList.remove('recording');
+        document.getElementById('status').textContent = 'Processing...';
+      };
+      
+      recognition.onerror = (event) => {
+        showError('Speech recognition error: ' + event.error);
+        stopRecording();
+      };
+    } else {
+      showError('Speech recognition not supported in this browser');
+    }
+    
+    function toggleRecording() {
+      if (isRecording) {
+        stopRecording();
+      } else {
+        startRecording();
+      }
+    }
+    
+    function startRecording() {
+      if (!recognition) return;
+      
+      isRecording = true;
+      document.getElementById('micButton').classList.add('recording');
+      document.getElementById('transcript').textContent = 'Listening...';
+      document.getElementById('expenseCard').classList.remove('show');
+      hideError();
+      
+      recognition.start();
+    }
+    
+    function stopRecording() {
+      if (recognition && isRecording) {
+        recognition.stop();
+      }
+    }
+    
+    async function processExpense(text) {
+      try {
+        const response = await fetch('/process-speech', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text })
+        });
+        
+        const data = await response.json();
+        
+        if (data.amount && data.category) {
+          // Show expense card
+          const symbol = data.currencySymbol || currencySymbol;
+          document.getElementById('amount').textContent = `${symbol}${parseInt(data.amount).toLocaleString()}`;
+          document.getElementById('category').textContent = data.category;
+          document.getElementById('expenseCard').classList.add('show');
+          
+          // Show AI insights
+          showAIInsights(data);
+          
+          // Update daily summary
+          updateDailySummary(data);
+          
+          document.getElementById('status').textContent = '✅ Expense recorded!';
+        } else {
+          document.getElementById('status').textContent = '❌ Could not extract expense details';
+          showAIInsights(data); // Still show what AI detected
+        }
+      } catch (error) {
+        showError('Failed to process expense');
+      }
+    }
+    
+    function showError(message) {
+      document.getElementById('error').textContent = message;
+      document.getElementById('error').style.display = 'block';
+      document.getElementById('status').textContent = 'Ready to listen';
+    }
+    
+    function hideError() {
+      document.getElementById('error').style.display = 'none';
+    }
+    
+    function showAIInsights(data) {
+      const insights = document.getElementById('comprehendResults');
+      let html = '';
+      
+      if (data.confidence) {
+        html += `<div><strong>Confidence:</strong> ${data.confidence} <span class="aws-badge">Comprehend</span></div>`;
+      }
+      
+      if (data.sentiment) {
+        html += `<div><strong>Sentiment:</strong> ${data.sentiment} <span class="aws-badge">Comprehend</span></div>`;
+      }
+      
+      if (data.entities && data.entities.length > 0) {
+        html += `<div><strong>Entities Found:</strong> <span class="aws-badge">Comprehend</span></div>`;
+        data.entities.forEach(entity => {
+          html += `<div style="margin-left: 15px;">• ${entity.text} (${entity.type}, ${Math.round(entity.score * 100)}%)</div>`;
+        });
+      }
+      
+      insights.innerHTML = html;
+      document.getElementById('aiInsights').classList.add('show');
+    }
+    
+    function updateDailySummary(data) {
+      if (data.dailyTotal !== undefined) {
+        const symbol = data.currencySymbol || currencySymbol;
+        document.getElementById('dailyTotal').textContent = `Today's Total: ${symbol}${data.dailyTotal.toLocaleString()}`;
+      }
+      
+      if (data.todayExpenses && data.todayExpenses.length > 0) {
+        const container = document.getElementById('recentExpenses');
+        container.innerHTML = '';
+        
+        data.todayExpenses.forEach(expense => {
+          const item = document.createElement('div');
+          item.className = 'expense-item';
+          const symbol = expense.currency === 'NGN' ? '₦' : '$';
+          item.innerHTML = `
+            <span>${symbol}${parseInt(expense.amount).toLocaleString()} - ${expense.category}</span>
+            <span style="font-size: 0.8em; color: #666;">${new Date(expense.timestamp).toLocaleTimeString()}</span>
+          `;
+          container.appendChild(item);
+        });
+      }
+    }
+    
+    // Load daily summary on page load
+    async function loadDailySummary() {
+      try {
+        const response = await fetch(`/daily-summary?currency=${currentCurrency}`);
+        const data = await response.json();
+        updateDailySummary(data);
+      } catch (error) {
+        console.error('Failed to load daily summary:', error);
+      }
+    }
+    
+    // Set currency preference
+    async function setCurrency(currency) {
+      try {
+        const response = await fetch('/set-currency', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ currency })
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+          currentCurrency = currency;
+          currencySymbol = data.currencySymbol;
+          
+          // Update UI
+          document.querySelectorAll('.currency-btn').forEach(btn => btn.classList.remove('active'));
+          document.getElementById(currency.toLowerCase() + 'Btn').classList.add('active');
+          
+          // Reload summary
+          loadDailySummary();
+        }
+      } catch (error) {
+        console.error('Failed to set currency:', error);
+      }
+    }
+    
+    // Export data as CSV
+    function exportData() {
+      window.open(`/export-csv?currency=${currentCurrency}`, '_blank');
+    }
+    
+    // Load summary when page loads
+    window.addEventListener('load', loadDailySummary);
+  </script>
+</body>
+</html>
