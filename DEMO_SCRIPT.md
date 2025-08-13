@@ -17,7 +17,7 @@ npm start
 - Show the daily summary section
 
 ### **3. Live Demo - Basic Expense (1 minute)**
-**Say:** *"I spent 5000 ringgit on food"*
+**Say:** *"I spent 500 ringgit on food"*
 
 **Highlight:**
 - Real-time speech recognition
@@ -26,7 +26,7 @@ npm start
 - Daily total updates
 
 ### **4. Live Demo - Complex Expense (1 minute)**
-**Say:** *"Paid 15000 ringgit for fuel today"*
+**Say:** *"Paid 150 ringgit for fuel today"*
 
 **Show:**
 - AI confidence levels
@@ -56,18 +56,18 @@ Add multiple expenses to show:
 ## 🎤 **Demo Phrases to Use**
 
 ### **Easy Extractions:**
-- "I spent 2000 ringgit on transport"
-- "Paid 8000 ringgit for groceries"
-- "5000 ringgit fuel"
+- "I spent 200 ringgit on transport"
+- "Paid 800 ringgit for groceries"
+- "50 ringgit fuel"
 
 ### **Complex Extractions:**
-- "Just bought lunch for 3500 ringgit"
+- "Just bought lunch for 35 ringgit"
 - "Spent fifteen thousand ringgit on shopping today"
-- "Paid the electricity bill, cost me 12000 ringgit"
+- "Paid the electricity bill, cost me 120 ringgit"
 
 ### **Edge Cases:**
-- "I think I spent around 4000 on food"
-- "Expensive dinner tonight, probably 8000 ringgit"
+- "I think I spent around 40 on food"
+- "Expensive dinner tonight, probably 800 ringgit"
 
 ## 🔧 **Technical Highlights for Viewers**
 
@@ -114,5 +114,5 @@ If live speech fails:
 # Backup curl command
 curl -X POST http://localhost:3000/process-speech \
   -H "Content-Type: application/json" \
-  -d '{"text": "I spent 5000 naira on food"}'
+  -d '{"text": "I spent 500 ringgit on food"}'
 ```
