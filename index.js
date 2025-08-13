@@ -2,6 +2,7 @@
 const express = require('express');
 const AWS = require('aws-sdk');
 const cors = require('cors');
+const serverless = require('serverless-http');
 
 const app = express();
 
@@ -236,6 +237,7 @@ app.get('/export-csv', (req, res) => {
 
 // Export for serverless deployment
 module.exports = app;
+module.exports.handler = serverless(app);
 
 // For local development
 if (require.main === module) {
