@@ -44,12 +44,12 @@ open http://localhost:3000
 ## 📝 Example Usage
 
 **Say any of these:**
-- *"I spent 5000 naira on food"*
-- *"Paid 15000 naira for fuel today"*
-- *"Just bought lunch for 3500 naira"*
+- *"I spent 5000 ringgit on food"*
+- *"Paid 15000 ringgit for fuel today"*
+- *"Just bought lunch for 3500 ringgit"*
 
 **The app extracts:**
-- Amount: ₦5,000
+- Amount: RM5,000
 - Category: food
 - Confidence: high
 - Updates daily total

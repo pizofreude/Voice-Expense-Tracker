@@ -183,7 +183,7 @@ app.post('/process-speech', async (req, res) => {
 // Set currency preference
 app.post('/set-currency', (req, res) => {
   const { currency } = req.body;
-  if (['USD', 'NGN'].includes(currency)) {
+  if (["USD", "MYR"].includes(currency)) {
     currentCurrency = currency;
     res.json({ 
       success: true, 
@@ -191,7 +191,7 @@ app.post('/set-currency', (req, res) => {
       currencySymbol: getCurrencySymbol(currentCurrency)
     });
   } else {
-    res.status(400).json({ error: 'Invalid currency. Use USD or NGN' });
+    res.status(400).json({ error: 'Invalid currency. Use USD or MYR' });
   }
 });
 

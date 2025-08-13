@@ -8,8 +8,8 @@ async function testDemo() {
     "I spent 50 dollars on food",
     "Paid 25 dollars for fuel today", 
     "Just bought lunch for 15 dollars",
-    "I spent 5000 naira on groceries",
-    "Paid 15000 naira for rent"
+  "I spent 5000 ringgit on groceries",
+  "Paid 15000 ringgit for rent"
   ];
 
   console.log('🧪 Testing Voice Expense Demo...\n');

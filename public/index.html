@@ -182,7 +182,7 @@
     
     <div class="currency-toggle">
       <button class="currency-btn active" id="usdBtn" onclick="setCurrency('USD')">USD ($)</button>
-      <button class="currency-btn" id="ngnBtn" onclick="setCurrency('NGN')">NGN (₦)</button>
+  <button class="currency-btn" id="myrBtn" onclick="setCurrency('MYR')">MYR (RM)</button>
     </div>
     
     <button class="mic-button" id="micButton" onclick="toggleRecording()">🎤</button>
@@ -192,7 +192,7 @@
     <div class="transcript" id="transcript">Your speech will appear here...</div>
     
     <div class="expense-card" id="expenseCard">
-      <div class="amount" id="amount">₦0</div>
+  <div class="amount" id="amount">RM0</div>
       <div class="category" id="category">Category</div>
     </div>
     
@@ -202,7 +202,7 @@
     </div>
     
     <div class="daily-summary" id="dailySummary">
-      <div class="daily-total" id="dailyTotal">Today's Total: ₦0</div>
+  <div class="daily-total" id="dailyTotal">Today's Total: RM0</div>
       <strong>Recent Expenses:</strong>
       <div class="recent-expenses" id="recentExpenses">
         <div style="text-align: center; color: #666; padding: 20px;">No expenses yet today</div>
@@ -362,7 +362,7 @@
         data.todayExpenses.forEach(expense => {
           const item = document.createElement('div');
           item.className = 'expense-item';
-          const symbol = expense.currency === 'NGN' ? '₦' : '$';
+          const symbol = expense.currency === 'MYR' ? 'RM' : '$';
           item.innerHTML = `
             <span>${symbol}${parseInt(expense.amount).toLocaleString()} - ${expense.category}</span>
             <span style="font-size: 0.8em; color: #666;">${new Date(expense.timestamp).toLocaleTimeString()}</span>
